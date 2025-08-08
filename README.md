@@ -31,7 +31,6 @@ Este proyecto es una aplicación web desarrollada con React y TensorFlow.js que 
 
 1. Cloná el repositorio:
 
-```bash
 git clone https://github.com/Facucajal/Juez-GPT.git
 cd nombre-del-repo
 
@@ -44,7 +43,7 @@ npm install
 npm run dev
 
 4. Abrí en tu navegador: http://localhost:5173
-```bash
+
 ---
 
 ## 📱 Uso
