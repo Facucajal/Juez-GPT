@@ -55,7 +55,6 @@ El contador se incrementará cuando el ángulo de la pierna pase de arriba (áng
 
 ## 📂 Estructura recomendada
 ```bash
-bash
 Copy
 Edit
 src/
