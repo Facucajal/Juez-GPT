@@ -54,6 +54,7 @@ Realizá una sentadilla delante del dispositivo.
 El contador se incrementará cuando el ángulo de la pierna pase de arriba (ángulo > 160°) a abajo (ángulo < 90°) y vuelva.
 
 ## 📂 Estructura recomendada
+```bash
 bash
 Copy
 Edit
