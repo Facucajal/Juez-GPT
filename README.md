@@ -55,8 +55,7 @@ El contador se incrementará cuando el ángulo de la pierna pase de arriba (áng
 
 ## 📂 Estructura recomendada
 ```bash
-Copy
-Edit
+
 src/
 ├── components/
 │   └── CameraView.jsx
