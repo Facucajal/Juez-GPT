@@ -1,0 +1,72 @@
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  color: #ffffff;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.app-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: radial-gradient(circle at center, #1c1c1c, #0a0a0a);
+}
+
+.reps-counter {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #00ffb3;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 255, 179, 0.3);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.reps-counter span {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+video,
+canvas {
+  width: 640px;
+  height: 480px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 179, 0.2);
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .reps-counter {
+    top: 10px;
+    left: 10px;
+    font-size: 18px;
+    padding: 8px 14px;
+    border-radius: 10px;
+  }
+
+  video,
+  canvas {
+    width: 90vw;
+    height: auto;
+    max-height: 90vh;
+  }
+
+  .app-container {
+    flex-direction: column;
+    padding: 10px;
+  }
+}
