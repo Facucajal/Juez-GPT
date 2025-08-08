@@ -44,7 +44,7 @@ npm install
 npm run dev
 
 4. Abrí en tu navegador: http://localhost:5173
-
+```bash
 ---
 
 ## 📱 Uso
