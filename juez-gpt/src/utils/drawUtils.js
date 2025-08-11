@@ -1,7 +1,24 @@
 import { getAngle } from "./mathUtils"
 
-export const drawKeypointsAndSkeleton = (ctx, keypoints) => {
-  ctx.clearRect(0, 0, 640, 480)
+export const drawKeypointsAndSkeleton = (webcamRef, canvasRef, keypoints) => {
+  const video = webcamRef.current.video
+  const canvas = canvasRef.current
+  const ctx = canvas.getContext('2d')
+
+  const vw = video.videoWidth
+  const vh = video.videoHeight
+  const dpr = window.devicePixelRatio || 1
+
+  ctx.save()
+  // dibujamos en coordenadas “CSS px”
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  ctx.clearRect(0, 0, vw, vh)
+
+  // espejo para coincidir con mirrored del video
+  ctx.translate(vw, 0)
+  ctx.scale(-1, 1)
+
+  // estilos
   ctx.fillStyle = 'red'
   ctx.strokeStyle = 'lime'
   ctx.lineWidth = 2

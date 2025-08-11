@@ -22,17 +22,9 @@ body, html, #root {
   position: absolute;
   top: 20px;
   left: 20px;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: bold;
-  color: #00ffb3;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 255, 179, 0.3);
   z-index: 10;
-  transition: all 0.3s ease;
 }
 
 .reps-counter span {
@@ -42,11 +34,8 @@ body, html, #root {
 
 video,
 canvas {
-  width: 640px;
-  height: 480px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 255, 179, 0.2);
-  transition: all 0.3s ease;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 @media (max-width: 768px) {
@@ -58,11 +47,8 @@ canvas {
     border-radius: 10px;
   }
 
-  video,
-  canvas {
-    width: 90vw;
-    height: auto;
-    max-height: 90vh;
+  .camera-container {
+    max-width: 100vw;   /* llena el ancho del móvil */
   }
 
   .app-container {

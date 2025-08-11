@@ -17,16 +17,12 @@ function App() {
       setLastPosition(pos)
     }
 
-    usePoseDetection(webcamRef, (keypoints) => {
-      const ctx = canvasRef.current.getContext('2d')
-      ctx.save()
-      ctx.scale(-1, 1)
-      ctx.translate(-640, 0)
-      drawKeypointsAndSkeleton(ctx, keypoints)
-      ctx.restore()
-
-      detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps)
-    })
+    usePoseDetection(webcamRef, canvasRef, (keypoints) => {
+    // Dibujo alineado (maneja DPR, espejo y tamaños adentro)
+    drawKeypointsAndSkeleton(webcamRef, canvasRef, keypoints)
+    // Lógica de conteo
+    detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps)
+  })
 
     return (
       <div className="app-container">
