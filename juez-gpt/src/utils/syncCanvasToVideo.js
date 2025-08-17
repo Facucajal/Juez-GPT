@@ -11,10 +11,6 @@ export const syncCanvasToVideo = (webcamRef, canvasRef) => {
       // tamaño real (pixeles físicos)
       canvas.width = vw * dpr
       canvas.height = vh * dpr
-      // tamaño CSS para que coincida con el video
-      canvas.style.width = `${vw}px`
-      canvas.style.height = `${vh}px`
-      video.style.width = `${vw}px`
-      video.style.height = `${vh}px`
+
       return true
     }

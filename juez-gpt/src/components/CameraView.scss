@@ -1,8 +1,0 @@
-.camera-container { 
-    position: relative; 
-    width: 100%; 
-    margin: 0 auto; 
-    aspect-ratio: 4 / 3;
-}
-.camera-video, .camera-canvas { display:block; width:100%; height:auto; border-radius:12px; }
-.camera-canvas { position:absolute; inset:0; pointer-events:none; }

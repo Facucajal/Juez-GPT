@@ -1,0 +1,76 @@
+.footer-bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 20;
+  padding: calc(env(safe-area-inset-bottom, 0px) + 10px) 14px 14px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* deja pasar gestos al video; los hijos habilitan */
+}
+
+.footer-blur {
+  position: absolute; inset: -20px 0 0 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+  filter: saturate(1.1);
+  pointer-events: none;
+}
+
+.footer-actions {
+  width: 100%;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(20,20,20,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+  justify-content: center;
+}
+
+.fb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  transition: transform .06s ease, background .2s ease;
+}
+
+.fb-btn:hover { background: rgba(255,255,255,0.1); }
+.fb-btn:active { transform: translateY(1px) scale(0.98); }
+
+.fb-segment {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.fb-chip {
+  min-width: 54px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  opacity: .8;
+  transition: background .2s ease, border-color .2s ease, opacity .2s;
+}
+
+.fb-chip:hover { opacity: 1; }
+.fb-chip.is-active {
+  background: rgba(0, 255, 179, 0.14);
+  border-color: rgba(0, 255, 179, 0.35);
+  opacity: 1;
+}

@@ -11,10 +11,8 @@ body, html, #root {
 
 .app-container {
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
   background: radial-gradient(circle at center, #1c1c1c, #0a0a0a);
 }
 
@@ -38,6 +36,23 @@ canvas {
   height: 100% !important;
 }
 
+.cam-toggle {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.cam-toggle:hover { background: rgba(0,0,0,0.6); }
+
 @media (max-width: 768px) {
   .reps-counter {
     top: 10px;
@@ -47,12 +62,12 @@ canvas {
     border-radius: 10px;
   }
 
-  .camera-container {
-    max-width: 100vw;   /* llena el ancho del móvil */
-  }
+//   .camera-container {
+//     max-width: 100vw;   /* llena el ancho del móvil */
+//   }
 
-  .app-container {
-    flex-direction: column;
-    padding: 10px;
-  }
+//   .app-container {
+//     flex-direction: column;
+//     padding: 10px;
+//   }
 }
