@@ -6,13 +6,17 @@ export const drawKeypointsAndSkeleton = (webcamRef, canvasRef, keypoints, opts) 
   const canvas = canvasRef.current
   const ctx = canvas.getContext('2d')
 
-  const vw = video.videoWidth
-  const vh = video.videoHeight
-  const dpr = window.devicePixelRatio || 1
+  // ▶️ escala y dpr calculados en syncCanvasToVideo
+  const sx  = canvas._scaleX || 1
+  const sy  = canvas._scaleY || 1
+  const dpr = canvas._dpr    || 1
+  const vw  = canvas._vw     || video.videoWidth
+  const vh  = canvas._vh     || video.videoHeight
+
 
   ctx.save()
   // dibujamos en coordenadas “CSS px”
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  ctx.setTransform(dpr * sx, 0, 0, dpr * sy, 0, 0)
   ctx.clearRect(0, 0, vw, vh)
 
   if (mirrored) {
@@ -140,11 +144,15 @@ export function drawLegsOverlay(webcamRef, canvasRef, keypoints, { mirrored = tr
   const canvas = canvasRef.current
   const ctx = canvas.getContext('2d')
 
-  const vw = video.videoWidth, vh = video.videoHeight
-  const dpr = Math.min(window.devicePixelRatio || 1, dprCap)
+    // ▶️ escala y dpr calculados en syncCanvasToVideo
+  const sx  = canvas._scaleX || 1
+  const sy  = canvas._scaleY || 1
+  const dpr = canvas._dpr    || 1
+  const vw  = canvas._vw     || video.videoWidth
+  const vh  = canvas._vh     || video.videoHeight
 
   ctx.save()
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  ctx.setTransform(dpr * sx, 0, 0, dpr * sy, 0, 0)
   ctx.clearRect(0, 0, vw, vh)
 
   if (mirrored) { ctx.translate(vw, 0); ctx.scale(-1, 1) }
