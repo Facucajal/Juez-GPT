@@ -121,3 +121,60 @@ export const drawKeypointsAndSkeleton = (webcamRef, canvasRef, keypoints, opts) 
 
   ctx.restore() // Vuelve a la orientación original
 }
+
+
+//Solo piernas
+
+const ESSENTIAL_POINTS = new Set([
+  'left_hip','left_knee','left_ankle',
+  'right_hip','right_knee','right_ankle'
+])
+
+const LEG_CONNECTIONS = [
+  ['left_hip','left_knee'], ['left_knee','left_ankle'],
+  ['right_hip','right_knee'], ['right_knee','right_ankle'],
+]
+
+export function drawLegsOverlay(webcamRef, canvasRef, keypoints, { mirrored = true, dprCap = 2 } = {}) {
+  const video = webcamRef.current.video
+  const canvas = canvasRef.current
+  const ctx = canvas.getContext('2d')
+
+  const vw = video.videoWidth, vh = video.videoHeight
+  const dpr = Math.min(window.devicePixelRatio || 1, dprCap)
+
+  ctx.save()
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  ctx.clearRect(0, 0, vw, vh)
+
+  if (mirrored) { ctx.translate(vw, 0); ctx.scale(-1, 1) }
+
+  // cache índice por nombre
+  const map = Object.fromEntries(keypoints.map(k => [k.name, k]))
+
+  // puntos (solo esenciales)
+  ctx.fillStyle = 'red'
+  for (const name of ESSENTIAL_POINTS) {
+    const kp = map[name]
+    if (kp?.score > 0.5) {
+      ctx.beginPath()
+      ctx.arc(kp.x, kp.y, 4, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+
+  // líneas (una sola pasada)
+  ctx.lineWidth = 2
+  ctx.strokeStyle = 'lime'
+  ctx.beginPath()
+  for (const [a, b] of LEG_CONNECTIONS) {
+    const A = map[a], B = map[b]
+    if (A?.score > 0.5 && B?.score > 0.5) {
+      ctx.moveTo(A.x, A.y)
+      ctx.lineTo(B.x, B.y)
+    }
+  }
+  ctx.stroke()
+
+  ctx.restore()
+}

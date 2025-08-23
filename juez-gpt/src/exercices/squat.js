@@ -1,29 +1,55 @@
 import { getAngle } from '../utils/mathUtils'
 
-export const detectSquat = (keypoints, lastPositionRef, updateLastPosition, setReps) => {
-    const left_hip = keypoints.find(p => p.name === 'left_hip')
-    const left_knee = keypoints.find(p => p.name === 'left_knee')
-    const left_ankle = keypoints.find(p => p.name === 'left_ankle')
-    const right_hip = keypoints.find(p => p.name === 'right_hip')
-    const right_knee = keypoints.find(p => p.name === 'right_knee')
-    const right_ankle = keypoints.find(p => p.name === 'right_ankle')
+export const detectSquat = (
+    keypoints,
+    lastPositionRef,
+    updateLastPosition,
+    setReps,
+    setAngle,
+    setLegsDetected
+) => {
+    const get = (name) => keypoints.find(p => p.name === name)
 
-    const validLeft = left_hip.score > 0.5 && left_knee.score > 0.5 && left_ankle.score > 0.5
-    const validRight = right_hip.score > 0.5 && right_knee.score > 0.5 && right_ankle.score > 0.5
+    const lh = get('left_hip')
+    const lk = get('left_knee')
+    const la = get('left_ankle')
+    const rh = get('right_hip')
+    const rk = get('right_knee')
+    const ra = get('right_ankle')
 
+    const validLeft = lh?.score > 0.5 && lk?.score > 0.5 && la?.score > 0.5
+    const validRight = rh?.score > 0.5 && rk?.score > 0.5 && ra?.score > 0.5
+
+    const legs = validLeft || validRight
+    setLegsDetected?.(legs)
+
+    if (!legs) return 
+
+    // ángulo por pierna (ponderado por score si están ambas)
     let angle
-
-    
     if (validLeft && validRight) {
-        angle = (getAngle(left_hip, left_knee, left_ankle) + getAngle(right_hip, right_knee, right_ankle)) / 2
+        const aL = getAngle(lh, lk, la)
+        const aR = getAngle(rh, rk, ra)
+        const sL = (lh.score + lk.score + la.score) / 3
+        const sR = (rh.score + rk.score + ra.score) / 3
+        angle = (aL * sL + aR * sR) / (sL + sR)
     } else if (validLeft) {
-        angle = getAngle(left_hip, left_knee, left_ankle)
-    } else if (validRight) {
-        angle = getAngle(right_hip, right_knee, right_ankle)
+        angle = getAngle(lh, lk, la)
     } else {
-        return // Ninguna pierna confiable → no hacer nada
+        angle = getAngle(rh, rk, ra)
     }
 
-    if (angle < 90 && lastPositionRef.current === 'up') updateLastPosition('down')
-    if (angle > 160 && lastPositionRef.current === 'down') { updateLastPosition('up'); setReps(r => r + 1) }
+    // actualizar UI
+    setAngle?.(Math.round(angle))
+
+    // conteo con FSM simple
+    const DOWN = 90
+    const UP = 160
+
+    if (angle < DOWN && lastPositionRef.current === 'up') {
+        updateLastPosition('down')
+    } else if (angle > UP && lastPositionRef.current === 'down') {
+        updateLastPosition('up')
+        setReps(r => r + 1)
+    }
 }

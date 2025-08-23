@@ -53,6 +53,34 @@ canvas {
 
 .cam-toggle:hover { background: rgba(0,0,0,0.6); }
 
+.hud {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 10px; align-items: center;
+  z-index: 12;
+}
+
+.status-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #ff4d4f; border: 2px solid rgba(255,255,255,0.6);
+  box-shadow: 0 0 10px rgba(255,77,79,0.5);
+}
+.status-dot.ok {
+  background: #16e087; box-shadow: 0 0 10px rgba(22,224,135,0.5);
+}
+
+.angle-chip, .fps-badge {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-weight: 700;
+  backdrop-filter: blur(6px);
+}
+.fps-badge { color: #0f0; font-variant-numeric: tabular-nums; }
+
+
 @media (max-width: 768px) {
   .reps-counter {
     top: 10px;

@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react'
 import CameraView from './components/CameraView/CameraView'
 import { usePoseDetection } from './hooks/usePoseDetection'
-import { drawKeypointsAndSkeleton } from './utils/drawUtils'
+import { drawKeypointsAndSkeleton, drawLegsOverlay } from './utils/drawUtils'
 import { detectSquat } from './exercices/squat'
 import './styles/App.scss'
 import FooterBar from './components/FooterBar/FooterBar'
@@ -21,35 +21,43 @@ function App() {
   const [showKeyPoints, setshowKeyPoints] = useState(true)
   const showedKeyPoints = showKeyPoints === true;
 
-  const updateLastPosition = (pos) => {
-    lastPositionRef.current = pos
-    setLastPosition(pos)
-  }
+  // HUD
+  const [fps, setFps] = useState(0)
+  const [angle, setAngle] = useState(null)
+  const [legsDetected, setLegsDetected] = useState(false)
 
   const videoConstraints = useMemo(() => ({
     facingMode,
-    width: { ideal: 1280 },
-    height: { ideal: 720 },
+    width: { ideal: 640 },   // estable y rápido en móviles
+    height: { ideal: 360 },
     frameRate: { ideal: 30 },
   }), [facingMode])
 
-  const toggleCamera = () => {
-    setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'))
+
+  const updateLastPosition = (pos) => {
+    lastPositionRef.current = pos
+    setLastPosition(pos)
   }
 
   const changeShowKeyPoints = () => {
     setshowKeyPoints(prev => (prev === true ? false : true))
   }
 
-  const resetCounter = () => {
+  const toggleCamera = () => {
+    setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'))
+  }
+
+  const onReset = () => {
     setReps(0)
     updateLastPosition('up')
+    const c = canvasRef.current
+    if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height)
   }
 
   usePoseDetection(webcamRef, canvasRef, (keypoints) => {
     // Dibujo alineado (maneja DPR, espejo y tamaños adentro)
     if (showedKeyPoints) {
-      drawKeypointsAndSkeleton(webcamRef, canvasRef, keypoints, { mirrored })
+      drawLegsOverlay(webcamRef, canvasRef, keypoints, { mirrored })
     }
     else {
       // limpiar el canvas por si quedó algo dibujado
@@ -58,11 +66,18 @@ function App() {
     }
 
     // Lógica de conteo
-    detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps)
-  })
+    detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps, setAngle, setLegsDetected )
+  }, { onFps: setFps, targetFps: 24 })
 
   return (
     <div className="app-container">
+      {/* HUD */}
+      <div className="hud">
+        <span className={`status-dot ${legsDetected ? 'ok' : 'no'}`} />
+        <span className="angle-chip">{angle != null ? `${angle}°` : '--°'}</span>
+        <span className="fps-badge">{fps} FPS</span>
+      </div>
+
       <div className="reps-counter">
         Repeticiones: <span>{reps}</span>
       </div>
@@ -75,8 +90,8 @@ function App() {
       />
       <FooterBar
         onToggleCamera={toggleCamera}
-        onReset={resetCounter}
-        showedKeyPoints = {showedKeyPoints}
+        onReset={onReset}
+        showedKeyPoints={showedKeyPoints}
         onChangeShowKeyPoints={changeShowKeyPoints}
       />
     </div>
