@@ -67,7 +67,7 @@ function App() {
 
     // Lógica de conteo
     detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps, setAngle, setLegsDetected )
-  }, { onFps: setFps, targetFps: 24 })
+  }, { onFps: setFps, targetFps: 24, backendPreference: 'webgpu' })
 
   return (
     <div className="app-container">

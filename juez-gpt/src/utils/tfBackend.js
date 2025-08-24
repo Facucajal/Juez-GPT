@@ -23,3 +23,13 @@ export async function pickBestBackend(order = ['webgpu', 'webgl' /*, 'wasm'*/]) 
   }
   return tf.getBackend()
 }
+
+export async function ensureBackend(preference = 'auto') {
+  if (preference === 'auto') {
+    return pickBestBackend({ order: ['webgpu', 'webgl'] }) // si querés priorizar velocidad, webgpu primero
+  }
+  if (await setIfAvailable(preference)) return tf.getBackend()
+  // fallback si el preferido no está
+  await setIfAvailable('webgl')
+  return tf.getBackend()
+}

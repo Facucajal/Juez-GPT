@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import * as tf from '@tensorflow/tfjs'
 import { syncCanvasToVideo } from '../utils/syncCanvasToVideo'
-import { tuneWebGL, pickBestBackend } from '../utils/tfBackend'
+import { tuneWebGL, pickBestBackend, ensureBackend } from '../utils/tfBackend'
 import { createMoveNetLightning } from '../services/detector'
 import { createFpsEmitter } from '../utils/fps'
 import { createInferenceGate } from '../utils/inferenceGate'
@@ -15,7 +15,7 @@ export const usePoseDetection = (
   webcamRef,
   canvasRef,
   onPoseDetected,
-  { onFps, targetFps = 24 } = {}
+  { onFps, targetFps = 24, backendPreference = 'auto' } = {}
 ) => {
   const onPoseDetectedRef = useRef(onPoseDetected)
   const onFpsRef = useRef(onFps)
@@ -51,7 +51,7 @@ export const usePoseDetection = (
       try {
         tuneWebGL()
         // Si tu pickBestBackend acepta orden, podés pasarla: { order: ['webgl','webgpu'] }
-        const chosen = await pickBestBackend()
+        const chosen = await ensureBackend(backendPreference) // 👈 fuerza/auto
         console.log('TFJS backend (init):', chosen)
         detector = await createMoveNetLightning()
       } catch (e) {
