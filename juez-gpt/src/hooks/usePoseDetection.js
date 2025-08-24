@@ -1,14 +1,15 @@
 // src/hooks/usePoseDetection.js
 import { useEffect, useRef } from 'react'
-import * as posedetection from '@tensorflow-models/pose-detection'
 import * as tf from '@tensorflow/tfjs'
-import '@tensorflow/tfjs-backend-webgl'
-import '@tensorflow/tfjs-backend-webgpu'
-// import '@tensorflow/tfjs-backend-wasm'
-
 import { syncCanvasToVideo } from '../utils/syncCanvasToVideo'
+import { tuneWebGL, pickBestBackend } from '../utils/tfBackend'
+import { createMoveNetLightning } from '../services/detector'
+import { createFpsEmitter } from '../utils/fps'
+import { createInferenceGate } from '../utils/inferenceGate'
 
-
+// Dejalos si querés permitir esos backends:
+import '@tensorflow/tfjs-backend-webgl'
+import '@tensorflow/tfjs-backend-webgpu' // si no querés WebGPU, comentá esta línea
 
 export const usePoseDetection = (
   webcamRef,
@@ -16,90 +17,87 @@ export const usePoseDetection = (
   onPoseDetected,
   { onFps, targetFps = 24 } = {}
 ) => {
-  // Mantener callbacks estables sin re-crear el detector
   const onPoseDetectedRef = useRef(onPoseDetected)
   const onFpsRef = useRef(onFps)
   useEffect(() => { onPoseDetectedRef.current = onPoseDetected }, [onPoseDetected])
   useEffect(() => { onFpsRef.current = onFps }, [onFps])
 
   useEffect(() => {
-    let sized = false
     let detector = null
-    let busy = false
+    let sized = false
     let rafId = 0
-    let lastFrameTs = performance.now()
-    let lastInferTs = 0
-    const targetMs = 1000 / targetFps
     let cancelled = false
 
-    const setIfAvailable = async (name) => {
-      try {
-        await tf.setBackend(name)
-        await tf.ready()
-        return tf.getBackend() === name
-      } catch { return false }
+    // Helpers
+    const isVideoReady = (v) =>
+      v && v.readyState === 4 &&
+      v.videoWidth > 0 && v.videoHeight > 0 &&
+      !v.paused && !v.ended
+
+    const recreateDetectorOn = async (backendName) => {
+      try { await detector?.dispose?.() } catch {}
+      await tf.setBackend(backendName)
+      await tf.ready()
+      detector = await createMoveNetLightning()
+      console.log('TFJS backend (switch):', tf.getBackend())
     }
 
-    const pickBestBackend = async () => {
-      const order = ['webgpu', 'webgl'/*, 'wasm'*/]  // activa 'wasm' si lo importaste
-      for (const b of order) {
-        if (await setIfAvailable(b)) return b
-      }
-      return tf.getBackend()
-    }
+    // Control de tasa (inferencias) + FPS estable
+    const targetMs = 1000 / targetFps
+    const gate = createInferenceGate(targetMs)
+    const emitFps = createFpsEmitter({ alpha: 0.25, emitMs: 400, onEmit: onFpsRef.current })
 
     const run = async () => {
-      // (Opcional) liberar texturas WebGL más agresivamente para evitar acumulación
-      try { tf.env().set('WEBGL_DELETE_TEXTURE_THRESHOLD', 0) } catch { }
       try {
+        tuneWebGL()
+        // Si tu pickBestBackend acepta orden, podés pasarla: { order: ['webgl','webgpu'] }
         const chosen = await pickBestBackend()
-        console.log('TFJS backend:', chosen)
-
-        detector = await posedetection.createDetector(
-          posedetection.SupportedModels.MoveNet,
-          { modelType: posedetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
-        )
+        console.log('TFJS backend (init):', chosen)
+        detector = await createMoveNetLightning()
       } catch (e) {
-        console.error('Fallo inicializando TF/Detector:', e)
-        return // no sigas si falló
+        console.error('Init TF/Detector failed:', e)
+        return
       }
-
-
 
       const loop = async (t) => {
         if (cancelled) return
-
-        // ✅ "now" definido siempre al comienzo y visible en todo el loop
         const now = t ?? performance.now()
 
         try {
           const video = webcamRef.current?.video
-          if (video && video.readyState === 4) {
-            if (!sized && video.videoWidth && video.videoHeight) {
+          if (isVideoReady(video)) {
+            // Re-sync si cambió la resolución real del stream
+            if (
+              !sized ||
+              canvasRef.current?._vw !== video.videoWidth ||
+              canvasRef.current?._vh !== video.videoHeight
+            ) {
               sized = syncCanvasToVideo(webcamRef, canvasRef)
             }
 
-            // FPS del loop
-            const fps = 1000 / (now - lastFrameTs)
-            lastFrameTs = now
-            onFpsRef.current?.(Math.round(fps))
+            // FPS (EMA con throttling de UI)
+            emitFps(now)
 
-            // Limitar inferencias y evitar solaparlas
-            if (!busy && now - lastInferTs >= targetMs) {
-              busy = true
-              lastInferTs = now
+            // Inferencia a ritmo objetivo y sin solapes
+            await gate.run(now, async () => {
               try {
                 const poses = await detector.estimatePoses(video)
                 if (poses?.length) onPoseDetectedRef.current?.(poses[0].keypoints)
-              } finally {
-                busy = false
+              } catch (e) {
+                const msg = String(e?.message || e)
+                const isWebGPU = tf.getBackend() === 'webgpu'
+                if (isWebGPU && msg.includes('importExternalTexture')) {
+                  console.warn('WebGPU no pudo importar el frame del video; fallback a WebGL…')
+                  await recreateDetectorOn('webgl')
+                } else {
+                  // otros errores: log y seguimos
+                  console.warn('estimatePoses error:', e)
+                }
               }
-            }
+            })
           }
         } catch (e) {
-          console.warn('Fallo en loop de detección:', e)
-          // por las dudas, si falló en medio de una inferencia:
-          busy = false
+          console.warn('Detection loop error:', e)
         }
 
         rafId = requestAnimationFrame(loop)
@@ -110,11 +108,10 @@ export const usePoseDetection = (
 
     run()
 
-    // Cleanup completo
     return () => {
       cancelled = true
       if (rafId) cancelAnimationFrame(rafId)
-      try { detector?.dispose?.() } catch { }
+      try { detector?.dispose?.() } catch {}
     }
-  }, [webcamRef, canvasRef, targetFps]) // 👈 dependencias mínimas
+  }, [webcamRef, canvasRef, targetFps])
 }
