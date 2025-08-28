@@ -9,16 +9,16 @@ function FooterBar({ onToggleCamera, onReset, showedKeyPoints, onChangeShowKeyPo
             <div className="footer-actions">
                 <button className="fb-btn" onClick={onToggleCamera} aria-label="Cambiar cámara">
                     {/* ícono switch cámara */}
-                    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M7 7h2.586l1.707-1.707A1 1 0 0 1 12 5h4a1 1 0 0 1 .894.553L18.618 7H19a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4h-1.382l-.724 1.447A1 1 0 0 1 16 19h-4a1 1 0 0 1-.707-.293L9.586 17H7a4 4 0 0 1-4-4v-2a4 4 0 0 1 4-4Zm0 2a2 2 0 0 0-2 2v2c0 1.103.897 2 2 2h3a1 1 0 0 1 .707.293L12.414 17H15.7l.724-1.447A1 1 0 0 1 17.618 15H19a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-1.382a1 1 0 0 1-.894-.553L15.382 7H12.1l-1.293 1.293A1 1 0 0 1 10.1 9H7Z" fill="currentColor" />
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                    <path d="M480-240q79 0 136-53.5T678-426l30 28 42-42-100-100-100 100 42 42 26-26q-6 53-45 88.5T480-300q-13 0-25.5-2.5T430-310l-44 44q22 12 45.5 19t48.5 7ZM310-340l100-100-42-42-26 26q6-53 45-88.5t93-35.5q13 0 25.5 2.5T530-570l44-44q-22-12-45.5-19t-48.5-7q-79 0-136 53.5T282-454l-30-28-42 42 100 100ZM160-120q-33 0-56.5-23.5T80-200v-480q0-33 23.5-56.5T160-760h126l74-80h240l74 80h126q33 0 56.5 23.5T880-680v480q0 33-23.5 56.5T800-120H160Zm0-80h640v-480H638l-73-80H395l-73 80H160v480Zm320-240Z" />
                     </svg>
                     <span>Cámara</span>
                 </button>
 
                 <button className="fb-btn" onClick={onReset} aria-label="Resetear contador">
                     {/* ícono reset */}
-                    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 6V3l-4 4 4 4V8c2.206 0 4 1.794 4 4a4 4 0 1 1-4-4Zm0-2a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4Z" fill="currentColor" />
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                    <path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440h80q0 117 81.5 198.5T480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720h-6l62 62-56 58-160-160 160-160 56 58-62 62h6q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Z"/>
                     </svg>
                     <span>Reset</span>
                 </button>

@@ -55,18 +55,19 @@ function App() {
   }
 
   usePoseDetection(webcamRef, canvasRef, (keypoints) => {
+
+    // Lógica de conteo
+    detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps, setAngle, setLegsDetected )
+
     // Dibujo alineado (maneja DPR, espejo y tamaños adentro)
     if (showedKeyPoints) {
-      drawLegsOverlay(webcamRef, canvasRef, keypoints, { mirrored })
+      drawLegsOverlay(webcamRef, canvasRef, keypoints, angle, { mirrored })
     }
     else {
       // limpiar el canvas por si quedó algo dibujado
       const c = canvasRef.current
       if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height)
     }
-
-    // Lógica de conteo
-    detectSquat(keypoints, lastPositionRef, updateLastPosition, setReps, setAngle, setLegsDetected )
   }, { onFps: setFps, targetFps: 24 })
 
   return (

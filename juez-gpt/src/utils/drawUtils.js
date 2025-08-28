@@ -1,7 +1,6 @@
 import { getAngle } from "./mathUtils"
 
-export const drawKeypointsAndSkeleton = (webcamRef, canvasRef, keypoints, opts) => {
-  const { mirrored = true } = opts
+export const drawKeypointsAndSkeleton = (webcamRef, canvasRef, keypoints, angle, { mirrored = true, dprCap = 2 } = {}) => {
   const video = webcamRef.current.video
   const canvas = canvasRef.current
   const ctx = canvas.getContext('2d')
@@ -139,7 +138,7 @@ const LEG_CONNECTIONS = [
   ['right_hip','right_knee'], ['right_knee','right_ankle'],
 ]
 
-export function drawLegsOverlay(webcamRef, canvasRef, keypoints, { mirrored = true, dprCap = 2 } = {}) {
+export function drawLegsOverlay(webcamRef, canvasRef, keypoints, angle, { mirrored = true, dprCap = 2 } = {}) {
   const video = webcamRef.current.video
   const canvas = canvasRef.current
   const ctx = canvas.getContext('2d')
@@ -173,7 +172,7 @@ export function drawLegsOverlay(webcamRef, canvasRef, keypoints, { mirrored = tr
 
   // líneas (una sola pasada)
   ctx.lineWidth = 2
-  ctx.strokeStyle = 'lime'
+  ctx.strokeStyle = angle < 90 ? 'orange' : 'green'
   ctx.beginPath()
   for (const [a, b] of LEG_CONNECTIONS) {
     const A = map[a], B = map[b]
